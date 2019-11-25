@@ -29,6 +29,8 @@ export class MetroService {
    */
   private async init() {
     // à compléter
+    [this.lignes, this.arrets] = await Promise.all( [this.getLignes(), this.getArrets()] );
+    this.dataInitialized.next(true);
   }
 
   /* Renvoie la description d'une ligne dont on passe l'identifiant en paramètre
@@ -54,8 +56,11 @@ export class MetroService {
     // à compléter
     // appeler la fonction fetch sur l'URL https://data.metromobilite.fr/api/findType/json?types=arret
     // une fois la réponse obtenue, appelez la méthode json sur cette réponse.
+    // Cela vous renvoie un objet de type FeatureArretCollection
     // Renvoyez l'attribut features de ce json
-    return [];
+    const R = await fetch('https://data.metromobilite.fr/api/findType/json?types=arret');
+    const json: FeatureArretCollection = await R.json();
+    return json.features;
   }
 
   /* Renvoie la promesse de la description des lignes de transports
@@ -65,7 +70,8 @@ export class MetroService {
     // à compléter
     // appeler la fonction fetch sur l'URL http://data.metromobilite.fr/api/routers/default/index/routes
     // une fois la réponse obtenue, appelez la méthode json sur cette réponse et renvoyez le résultat
-    return [];
+    const R = await fetch('http://data.metromobilite.fr/api/routers/default/index/routes');
+    return R.json();
   }
 
 }
