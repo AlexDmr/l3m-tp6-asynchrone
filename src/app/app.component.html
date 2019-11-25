@@ -12,6 +12,24 @@
 
 <yaga-map [lng]="5.724524" [lat]="45.188529" [zoom]="12">
   <yaga-tile-layer [url]="tileLayer"></yaga-tile-layer>
+  <yaga-marker [lng] = "5.724524"
+               [lat] = "45.188529"
+               [display] = "true"
+               [opacity] = "1"
+  >
+    <yaga-icon [iconUrl]="iconMarker"></yaga-icon>
+  </yaga-marker>
+</yaga-map>
+
+<section *ngIf="dataInitializedObs | async">
+  Initialisation terminée !
+  <p>Il y a {{}} arrêts.</p>
+  <p>Il y a {{}} lignes de transports.</p>
+</section>
+
+<!--
+<yaga-map [lng]="5.724524" [lat]="45.188529" [zoom]="12">
+  <yaga-tile-layer [url]="tileLayer"></yaga-tile-layer>
   <yaga-feature-group *ngFor="let ligneDescr of lignesDescrObs | async">
     <yaga-polyline [geoJSON]="geoJSON(ligneDescr)"
                    [color]="getColor(ligneDescr)"
@@ -19,8 +37,8 @@
   </yaga-feature-group>
   <yaga-feature-group *ngFor="let anim of LanimPoints | async">
     <yaga-marker *ngIf = "anim | async as pt"
-                 [lat] = "pt[1]"
                  [lng] = "pt[0]"
+                 [lat] = "pt[1]"
                  [display] = "true"
                  [opacity] = "1"
     >
@@ -47,3 +65,4 @@
           (click) = "Parcourir(lignePourParcours)"
           >En route!</button>
 </section>
+-->

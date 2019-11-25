@@ -1,5 +1,5 @@
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {map, multicast} from 'rxjs/operators';
 
 // Liste des lignes de transport
 // http://data.metromobilite.fr/api/routers/default/index/routes
@@ -109,7 +109,8 @@ export function getAnimationCoordinates(duration: number, path: GeoPoint[]): Obs
         delta = (isNaN(delta) || Math.abs(delta) === Infinity) ? 0 : delta;
         return S1.pt.map( (x, i) => x + (S2.pt[i] - x) * delta );
       }
-    })
+    }),
+    multicast( () => new Subject<number[]>() )
   );
 }
 

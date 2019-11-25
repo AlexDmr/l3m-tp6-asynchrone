@@ -16,13 +16,15 @@ import {computeDistance, FeatureLigne, GeoPoint, getAnimationCoordinates, getAni
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
+  // Utile pour la partie cartographie
   tileLayer = OSM_TILE_LAYER_URL;
   iconMarker = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Map_marker.svg/585px-Map_marker.svg.png';
+
+  // Un observable qui produit des liste d'identifiants de lignes de transports à visualiser
   lignesIdsSubj = new BehaviorSubject<string[]>([]);
-  lignesDescrObs: Observable<FeatureLigne[]>;
-  lignePourParcours: FeatureLigne;
-  animPourParcour = new BehaviorSubject<Observable<GeoPoint>[]>([]);
-  LanimPoints: Observable<Observable<GeoPoint>[]> = this.animPourParcour.asObservable();
+
+  // Un observable pour gérer des animations de marqueurs
+  private animPourParcour = new BehaviorSubject<Observable<GeoPoint>[]>([]);
 
   constructor(private ms: MetroService, public dialog: MatDialog) {
     const key = 'L3M_TP6_LignesIds';
@@ -38,17 +40,7 @@ export class AppComponent implements OnInit {
     }
 
     // Subscribe to lignesDescrSubj updates
-    this.lignesIdsSubj.subscribe(
-      ids => {
-        console.log(ids);
-        localStorage.setItem(key, JSON.stringify(this.lignesIdsSubj.getValue() ) );
-      }
-    );
-
-    // Transfom ligne identifiers into FeatureLigne[]
-    this.lignesDescrObs = this.lignesIdsSubj.pipe(
-      flatMap( async ids => Promise.all( ids.map( id => ms.getLigneDescr(id) ) ) )
-    );
+    this.lignesIdsSubj.subscribe(ids => localStorage.setItem(key, JSON.stringify(this.lignesIdsSubj.getValue() ) ) );
   }
 
   ngOnInit() {
@@ -72,6 +64,7 @@ export class AppComponent implements OnInit {
     return this.lignesIdsSubj.getValue();
   }
 
+  // Pour décrire géographiquement une ligne de transport
   geoJSON(ligneDescr: FeatureLigne): GeoJSONFeature<GeoJSON.LineString> {
     const geo: GeoJSONFeature<GeoJSON.LineString> = {
       type: 'Feature',
