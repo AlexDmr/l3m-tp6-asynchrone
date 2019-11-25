@@ -39,7 +39,9 @@
 
 <ul>
   <li *ngFor="let obsPt of animPourParcour | async">
-    {{obsPt | async | json}}
+    <pre *ngIf="obsPt | async as pt">
+      {{pt | json}}
+    </pre>
   </li>
 </ul>
 <button mat-raised-button color="primary"
