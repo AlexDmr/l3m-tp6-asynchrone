@@ -23,8 +23,8 @@
 
 <section *ngIf="dataInitializedObs | async">
   Initialisation terminée !
-  <p>Il y a {{}} arrêts.</p>
-  <p>Il y a {{}} lignes de transports.</p>
+  <p>Il y a {{arrets.length}} arrêts.</p>
+  <p>Il y a {{lignes.length}} lignes de transports.</p>
 </section>
 
 <!--

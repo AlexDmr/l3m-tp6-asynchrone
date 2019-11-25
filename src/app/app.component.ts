@@ -5,9 +5,8 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 import {Feature as GeoJSONFeature} from 'geojson';
 import {MatDialog} from '@angular/material';
 import {DialogLignesComponent} from './dialog-lignes/dialog-lignes.component';
-import {flatMap, repeat} from 'rxjs/operators';
-import {AnimationFrameScheduler} from 'rxjs/internal/scheduler/AnimationFrameScheduler';
-import {computeDistance, FeatureLigne, GeoPoint, getAnimationCoordinates, getAnimationObservable} from './definitions';
+import {flatMap, multicast} from 'rxjs/operators';
+import {FeatureArret, FeatureLigne, GeoPoint, getAnimationCoordinates, Ligne} from './definitions';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +18,9 @@ export class AppComponent implements OnInit {
   // Utile pour la partie cartographie
   tileLayer = OSM_TILE_LAYER_URL;
   iconMarker = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Map_marker.svg/585px-Map_marker.svg.png';
+
+  // Un observable qui produit des descriptions de lignes de transports
+  lignesDescrObs: Observable<FeatureLigne[]>;
 
   // Un observable qui produit des liste d'identifiants de lignes de transports à visualiser
   lignesIdsSubj = new BehaviorSubject<string[]>([]);
@@ -41,6 +43,13 @@ export class AppComponent implements OnInit {
 
     // Subscribe to lignesDescrSubj updates
     this.lignesIdsSubj.subscribe(ids => localStorage.setItem(key, JSON.stringify(this.lignesIdsSubj.getValue() ) ) );
+
+    // Transfome les identifiants de lignes en FeatureLigne[]
+    this.lignesDescrObs = this.lignesIdsSubj.pipe(
+      flatMap( ids => Promise.all( ids.map( id => ms.getLigneDescr(id) ) ) ),
+      multicast( () => new BehaviorSubject([]) )
+    );
+
   }
 
   ngOnInit() {
@@ -50,9 +59,12 @@ export class AppComponent implements OnInit {
     return this.ms.dataInitializedObs;
   }
 
-  getLatLng(arretId: string): GeoPoint {
-    const arret = this.ms.arrets.find( a => a.properties.id === arretId);
-    return arret ? arret.geometry.coordinates : [999, 999];
+  get lignes(): Ligne[] {
+    return this.ms.lignes;
+  }
+
+  get arrets(): FeatureArret[] {
+    return this.ms.arrets;
   }
 
   getColor(ligneDescr: FeatureLigne): string {
@@ -85,11 +97,13 @@ export class AppComponent implements OnInit {
       data: {selectedLinesId: this.selectedLinesId}
     });
 
-    const Lids: string[] = await dialogRef.afterClosed().toPromise();
-    // console.log('Selected lignes ID:', Lids);
-    if (Lids) {
-      this.lignesIdsSubj.next( Lids );
-    }
+    // La promesse P sera résolue avec un tableau d'identifiant de lignes
+    const P: Promise<string[]> = dialogRef.afterClosed().toPromise();
+
+    // à compléter :
+    // Attendre que la promesse P soit résolue, récupérer le tableau d'identifiant de lignes
+    // Si ce tableau est définit, alors publiez le via l'obervable lignesIdsSubj
+
   }
 
   async Parcourir(ligne: FeatureLigne) {

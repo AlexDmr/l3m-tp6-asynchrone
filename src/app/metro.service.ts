@@ -8,17 +8,21 @@ import {FeatureArret, FeatureArretCollection, FeatureLigne, FeatureLigneCollecti
 export class MetroService {
   arrets: FeatureArret[] = []; // La liste des arrêts
   lignes: Ligne[] = []; // La liste des lignes de transports
+
   // Un observable pour savoir si les listes précédentes ont été initialisées :
   private dataInitialized = new BehaviorSubject<boolean>(false);
   dataInitializedObs = this.dataInitialized.asObservable();
+
   // on essaie de se rappeler des descriptions de lignes qu'on a déjà
+  // Ce tableau associatif est utilisé dans la méthode getLigneDescr
   private mapLigneDescr = new Map<string, FeatureLigne>();
 
   constructor() {
     this.init();
   }
 
-  /* Fait deux requêtes pour obtenir les arrets et les lignes de transports
+  /* Fait deux requêtes pour obtenir les arrets et les lignes de transports.
+   * Utilisez les méthodes getArrets et getLignes
    * Une fois les deux résultats reçut, la méthode en informe le reste du code
    * en produisant une nouvelle valeur booléen valant true :
    * utilisez pour cela la méthode next de l'attribut dataInitialized.
@@ -49,14 +53,19 @@ export class MetroService {
   private async getArrets(): Promise<FeatureArret[]> {
     // à compléter
     // appeler la fonction fetch sur l'URL https://data.metromobilite.fr/api/findType/json?types=arret
-    // une fois la réponse obtnue, appelez la méthode json sur cette réponse.
+    // une fois la réponse obtenue, appelez la méthode json sur cette réponse.
     // Renvoyez l'attribut features de ce json
     return [];
   }
 
+  /* Renvoie la promesse de la description des lignes de transports
+   *
+   */
   private async getLignes(): Promise<Ligne[]> {
-    const R: Response = await fetch('http://data.metromobilite.fr/api/routers/default/index/routes');
-    return R.json();
+    // à compléter
+    // appeler la fonction fetch sur l'URL http://data.metromobilite.fr/api/routers/default/index/routes
+    // une fois la réponse obtenue, appelez la méthode json sur cette réponse et renvoyez le résultat
+    return [];
   }
 
 }
