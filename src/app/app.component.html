@@ -19,6 +19,11 @@
   >
     <yaga-icon [iconUrl]="iconMarker"></yaga-icon>
   </yaga-marker>
+  <yaga-feature-group *ngFor="let line of lignesDescrObs | async">
+    <yaga-polyline [color]   = "getColor(line)"
+                   [geoJSON] = "geoJSON(line)"
+    ></yaga-polyline>
+  </yaga-feature-group>
 </yaga-map>
 
 <section *ngIf="dataInitializedObs | async">

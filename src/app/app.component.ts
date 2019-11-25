@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {OSM_TILE_LAYER_URL} from '@yaga/leaflet-ng2';
 import {MetroService} from './metro.service';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, ConnectableObservable, Observable, of} from 'rxjs';
 import {Feature as GeoJSONFeature} from 'geojson';
 import {MatDialog} from '@angular/material';
 import {DialogLignesComponent} from './dialog-lignes/dialog-lignes.component';
@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   iconMarker = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Map_marker.svg/585px-Map_marker.svg.png';
 
   // Un observable qui produit des descriptions de lignes de transports
-  lignesDescrObs: Observable<FeatureLigne[]>;
+  lignesDescrObs: ConnectableObservable<FeatureLigne[]>;
 
   // Un observable qui produit des liste d'identifiants de lignes de transports à visualiser
   lignesIdsSubj = new BehaviorSubject<string[]>([]);
@@ -48,8 +48,8 @@ export class AppComponent implements OnInit {
     this.lignesDescrObs = this.lignesIdsSubj.pipe(
       flatMap( ids => Promise.all( ids.map( id => ms.getLigneDescr(id) ) ) ),
       multicast( () => new BehaviorSubject([]) )
-    );
-
+    ) as ConnectableObservable<FeatureLigne[]>;
+    this.lignesDescrObs.connect();
   }
 
   ngOnInit() {
@@ -103,7 +103,11 @@ export class AppComponent implements OnInit {
     // à compléter :
     // Attendre que la promesse P soit résolue, récupérer le tableau d'identifiant de lignes
     // Si ce tableau est définit, alors publiez le via l'obervable lignesIdsSubj
-
+    const L = await P;
+    console.log('Lignes sélectionnées', L);
+    if (P !== undefined) {
+      this.lignesIdsSubj.next(L);
+    }
   }
 
   async Parcourir(ligne: FeatureLigne) {
