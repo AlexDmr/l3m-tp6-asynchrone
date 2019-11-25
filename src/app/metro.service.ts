@@ -54,6 +54,7 @@ export class MetroService {
     // à compléter
     // appeler la fonction fetch sur l'URL https://data.metromobilite.fr/api/findType/json?types=arret
     // une fois la réponse obtenue, appelez la méthode json sur cette réponse.
+    // Cela vous renvoie un objet de type FeatureArretCollection
     // Renvoyez l'attribut features de ce json
     return [];
   }
