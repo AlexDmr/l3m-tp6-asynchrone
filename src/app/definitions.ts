@@ -1,4 +1,4 @@
-import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, ConnectableObservable, Observable, Subject} from 'rxjs';
 import {map, multicast} from 'rxjs/operators';
 
 // Liste des lignes de transport
@@ -96,7 +96,7 @@ export function getGeoPointAndLength([prevPt, ...path]: GeoPoint[]): GeoPointAnd
 export function getAnimationCoordinates(duration: number, path: GeoPoint[]): Observable<GeoPoint> {
   const gpl = getGeoPointAndLength(path);
   const cumulativeDistance = gpl[gpl.length - 1].cumulativeDistance;
-  return getAnimationObservable(duration, 0, cumulativeDistance).pipe(
+  const obs = getAnimationObservable(duration, 0, cumulativeDistance).pipe(
     map( ({t, v}) => {
       const i1 = gpl.findIndex( step => step.cumulativeDistance >= v );
       const i2 = (i1 + 1) < gpl.length ? i1 + 1 : i1;
@@ -111,7 +111,9 @@ export function getAnimationCoordinates(duration: number, path: GeoPoint[]): Obs
       }
     }),
     multicast( () => new Subject<number[]>() )
-  );
+  ) as ConnectableObservable<number[]>;
+  obs.connect();
+  return obs;
 }
 
 export function getAnimationObservable(duration: number, v0: number = 0, v1: number = 100): Observable<{t: number, v: number}> {
