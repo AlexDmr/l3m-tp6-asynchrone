@@ -1,0 +1,19 @@
+
+<mat-toolbar>
+  <h1>Lignes de bus et tram</h1>
+</mat-toolbar>
+<section>
+  <mat-list *ngIf="dataInitializedObs | async">
+    <mat-list-item *ngFor="let ligne of lignes">
+      <mat-checkbox [ngModel]="isSelected(ligne)"
+                    (ngModelChange)="select(ligne, $event)"
+      >
+        {{ligne.shortName}}: {{ligne.longName}}
+      </mat-checkbox>
+    </mat-list-item>
+  </mat-list>
+</section>
+<footer>
+  <button mat-raised-button color="warn" (click)="cancel()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="validate()">Valider</button>
+</footer>

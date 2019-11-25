@@ -1,0 +1,20 @@
+:host {
+  mat-toolbar {
+    display: flex;
+    flex-flow: row;
+
+    .space {
+      flex: 1 1;
+    }
+
+    mat-spinner {
+      width: 64px;
+      height: 64px;
+    }
+  }
+
+  yaga-map {
+    height: 500px;
+    border: solid black 1px;
+  }
+}
