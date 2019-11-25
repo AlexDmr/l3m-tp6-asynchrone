@@ -24,8 +24,30 @@
                    [geoJSON] = "geoJSON(line)"
     ></yaga-polyline>
   </yaga-feature-group>
+  <yaga-feature-group *ngFor="let obsPt of animPourParcour | async">
+    <yaga-marker *ngIf="obsPt | async as pt"
+                 [lng] = "pt[0]"
+                 [lat] = "pt[1]"
+                 [display] = "true"
+                 [opacity] = "1"
+    >
+      <yaga-icon [iconUrl]="iconMarker"></yaga-icon>
+    </yaga-marker>
+  </yaga-feature-group>
+
 </yaga-map>
 
+<ul>
+  <li *ngFor="let obsPt of animPourParcour | async">
+    {{obsPt | async | json}}
+  </li>
+</ul>
+<button mat-raised-button color="primary"
+        *ngIf = "lignesDescrObs | async as L"
+        (click)="Parcourir(L)"
+>
+  GO
+</button>
 <section *ngIf="dataInitializedObs | async">
   Initialisation terminée !
   <p>Il y a {{arrets.length}} arrêts.</p>

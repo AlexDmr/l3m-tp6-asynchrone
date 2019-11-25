@@ -5,7 +5,7 @@ import {BehaviorSubject, ConnectableObservable, Observable, of} from 'rxjs';
 import {Feature as GeoJSONFeature} from 'geojson';
 import {MatDialog} from '@angular/material';
 import {DialogLignesComponent} from './dialog-lignes/dialog-lignes.component';
-import {flatMap, multicast} from 'rxjs/operators';
+import {filter, flatMap, multicast} from 'rxjs/operators';
 import {FeatureArret, FeatureLigne, GeoPoint, getAnimationCoordinates, Ligne} from './definitions';
 
 @Component({
@@ -46,6 +46,7 @@ export class AppComponent implements OnInit {
 
     // Transfome les identifiants de lignes en FeatureLigne[]
     this.lignesDescrObs = this.lignesIdsSubj.pipe(
+      filter( ids => !!ids ),
       flatMap( ids => Promise.all( ids.map( id => ms.getLigneDescr(id) ) ) ),
       multicast( () => new BehaviorSubject([]) )
     ) as ConnectableObservable<FeatureLigne[]>;
@@ -105,16 +106,14 @@ export class AppComponent implements OnInit {
     // Si ce tableau est définit, alors publiez le via l'obervable lignesIdsSubj
     const L = await P;
     console.log('Lignes sélectionnées', L);
-    if (P !== undefined) {
+    if (L !== undefined) {
       this.lignesIdsSubj.next(L);
     }
   }
 
-  async Parcourir(ligne: FeatureLigne) {
-    const obs = getAnimationCoordinates(10000, ligne.geometry.coordinates[0]);
-    this.animPourParcour.next( [...this.animPourParcour.getValue(), obs] );
-    await obs.toPromise();
-    this.animPourParcour.next( this.animPourParcour.getValue().filter( o => o !== obs ) );
+  Parcourir(lignes: FeatureLigne[]) {
+    const LP = lignes.map( ligne => getAnimationCoordinates(10000, ligne.geometry.coordinates[0]) );
+    this.animPourParcour.next( [...this.animPourParcour.getValue(), ...LP] );
   }
 
 }
