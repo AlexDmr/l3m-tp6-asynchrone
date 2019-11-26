@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
   lignesIdsSubj = new BehaviorSubject<string[]>([]);
 
   // Un observable pour gérer des animations de marqueurs
-  private animPourParcour = new BehaviorSubject<Observable<GeoPoint>[]>([]);
+  animPourParcour = new BehaviorSubject<Observable<GeoPoint>[]>([]);
 
   constructor(private ms: MetroService, public dialog: MatDialog) {
     const key = 'L3M_TP6_LignesIds';
@@ -111,9 +111,19 @@ export class AppComponent implements OnInit {
     }
   }
 
-  Parcourir(lignes: FeatureLigne[]) {
-    const LP = lignes.map( ligne => getAnimationCoordinates(10000, ligne.geometry.coordinates[0]) );
-    this.animPourParcour.next( [...this.animPourParcour.getValue(), ...LP] );
+  async Parcourir(lignes: FeatureLigne[]) {
+    const LO = lignes.map( ligne => getAnimationCoordinates(5000, ligne.geometry.coordinates[0]) );
+    this.animPourParcour.next( [...this.animPourParcour.getValue(), ...LO] );
+    // à compléter :
+    // Lorsque les animations référencées par LP sont terminées, retirez les de animPourParcour
+    // Note : Pour passer d'un observable à une promesse qui indique lorsque l'observable est terminé, appelez la méthode toPromise.
+    await Promise.all( LO.map( O => O.toPromise()) );
+    console.log('on fait le ménage dans les animations');
+    this.animPourParcour.next(
+      this.animPourParcour.getValue().filter(
+        o => LO.indexOf(o) === -1
+      )
+    );
   }
 
 }

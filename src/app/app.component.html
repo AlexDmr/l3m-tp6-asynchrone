@@ -37,19 +37,13 @@
 
 </yaga-map>
 
-<ul>
-  <li *ngFor="let obsPt of animPourParcour | async">
-    <pre *ngIf="obsPt | async as pt">
-      {{pt | json}}
-    </pre>
-  </li>
-</ul>
 <button mat-raised-button color="primary"
         *ngIf = "lignesDescrObs | async as L"
         (click)="Parcourir(L)"
 >
   GO
 </button>
+
 <section *ngIf="dataInitializedObs | async">
   Initialisation terminée !
   <p>Il y a {{arrets.length}} arrêts.</p>
