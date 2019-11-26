@@ -106,11 +106,12 @@ export class AppComponent implements OnInit {
 
   }
 
-  async Parcourir(ligne: FeatureLigne) {
-    const obs = getAnimationCoordinates(10000, ligne.geometry.coordinates[0]);
-    this.animPourParcour.next( [...this.animPourParcour.getValue(), obs] );
-    await obs.toPromise();
-    this.animPourParcour.next( this.animPourParcour.getValue().filter( o => o !== obs ) );
+  Parcourir(lignes: FeatureLigne[]) {
+    const LO = lignes.map( ligne => getAnimationCoordinates(10000, ligne.geometry.coordinates[0]) );
+    this.animPourParcour.next( [...this.animPourParcour.getValue(), ...LO] );
+    // à compléter :
+    // Lorsque les animations référencées par LP sont terminées, retirez les de animPourParcour
+    // Note : Pour passer d'un observable à une promesse qui indique lorsque l'observable est terminé, appelez la méthode toPromise.
   }
 
 }
